@@ -13,9 +13,10 @@ enum class Commands {
     notars,
     time,
     flows,
+    down
 }
 
-class RpcCmdr(val addr: String, val user: String, val password: String) {
+class RpcCmdr(val addr: String, val user: String, private val password: String) {
     val nodeAddr by lazy { parse(addr) }
     val client by lazy { CordaRPCClient(nodeAddr) }
     val conn by lazy { client.start(user, password) }
@@ -32,6 +33,7 @@ class RpcCmdr(val addr: String, val user: String, val password: String) {
             Commands.notars -> { println( "notars unimplemented")}
             Commands.time -> { println( "Node time is ${ops.currentNodeTime()}")}
             Commands.flows -> { println( "Registered flows: ${ops.currentNodeTime()}")}
+            Commands.down -> { println( "Shutting node ${me.name} down."); ops.shutdown() }
         }
         conn.notifyServerAndClose()
     }
