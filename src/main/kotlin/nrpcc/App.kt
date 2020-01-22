@@ -15,5 +15,11 @@ fun main(args: Array<String>) {
         } else {
             println("${e.message}")
         }
+    } catch (e: Exception) {
+        if (e.message.toString().startsWith("AMQ119031: Unable to validate user from ")) {
+            println("Cannot login to $hostPort as '$user' with password '$password'")
+        } else {
+            println("${e.message}")
+        }
     }
 }
