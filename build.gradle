@@ -1,0 +1,47 @@
+plugins {
+    id 'org.jetbrains.kotlin.jvm' version '1.2.71'
+    id 'application'
+}
+
+
+ext {
+    corda_release_group = "net.corda"
+    corda_base_version = "4.3"
+ // log4j_version = '2.9.1'
+ // kotlin_version = '1.2.71'
+    artifactoryUrl='https://software.r3.com/artifactory'
+}
+
+repositories {
+    jcenter()
+    // corda-core|-jackson|-rpc|-confidential-identities;
+    maven { url "$artifactoryUrl/corda" }
+}
+
+dependencies {
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
+    testImplementation 'org.jetbrains.kotlin:kotlin-test'
+    testImplementation 'org.jetbrains.kotlin:kotlin-test-junit'
+
+    compile "$corda_release_group:corda-rpc:$corda_base_version"
+    compile "$corda_release_group:corda-jackson:$corda_base_version"
+    compileOnly "$corda_release_group:corda-core:$corda_base_version"
+    compileOnly "$corda_release_group:corda-confidential-identities:$corda_base_version"
+}
+
+tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile) {
+    kotlinOptions {
+        languageVersion = "1.2"
+        apiVersion = "1.2"
+        jvmTarget = "1.8"
+    }
+}
+
+application {
+    mainClassName = 'nrpcc.AppKt'
+}
+
+wrapper {
+    gradleVersion = "5.6.4"
+    distributionType = Wrapper.DistributionType.ALL
+}
