@@ -1,14 +1,20 @@
 package nrpcc
 
 fun main(args: Array<String>) {
-    require(args.isNotEmpty()) { "Usage: <binary> <cmd>\n" +
-            "Example: <binary> exec MyFlow arg1: 10, toParty: PartyB" }
-    val cmd = Commands.valueOf(args[0])
+    val cmd: Command
+    var flowNam: String? = null
+    var flowArgs = ""
+    when (args.size) {
+        0 -> { usage(); kotlin.system.exitProcess(1) }
+        1 -> { cmd = Command.valueOf(args[0]) }
+        else -> {cmd = Command.valueOf(args[0]); flowNam=args[1]; flowArgs=args.drop(2).joinToString(separator=" ")}
+    }
+
     val hostPort = "localhost:10002"
     val user = "userN"
     val password = "X"
     try {
-        RpcCmdr(hostPort, user, password).cmd(cmd)
+        RpcCmdr(hostPort, user, password).cmd(cmd, flowNam, flowArgs)
     } catch (e: net.corda.client.rpc.RPCException) {
         if (e.message.toString().startsWith("Cannot connect to server(s). Tried with all available servers.")) {
             println("Cannot connect to $hostPort")
@@ -23,3 +29,6 @@ fun main(args: Array<String>) {
         }
     }
 }
+
+fun usage() { println("Usage: <binary> <cmd>\n" +
+        "Example: <binary> exec MyFlow arg1: 10, toParty: PartyB") }
