@@ -15,8 +15,8 @@ fun main(args: Array<String>) {
     val password = "X"
     try {
         val r = RpcCmdr(hostPort, user, password).cmd(cmd, flowNam, flowArgs)
-        Thread.sleep(1000)
-                r.dispose()
+        Thread.sleep(12) // TODO hide this waiting in dispose(), better yet make it a parameter
+        r.dispose()
     } catch (e: net.corda.client.rpc.RPCException) {
         if (e.message.toString().startsWith("Cannot connect to server(s). Tried with all available servers.")) {
             println("Cannot connect to $hostPort")

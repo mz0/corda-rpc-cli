@@ -67,11 +67,15 @@ class RpcCmdr(val addr: String, val user: String, private val password: String) 
         )) // make an Observer, and subscribe it to the FlowProgressHandle updates
 
         this.busy = true; println("${System.currentTimeMillis()} ${fh.returnValue.get()}") // start flow & get result
-        println("${System.currentTimeMillis()}  exec(,) finish")
+        println("${System.currentTimeMillis()} exec $flowNam finish")
     }
 
     fun dispose() {
-        println("${System.currentTimeMillis()} closing RPC connection")
-        conn.notifyServerAndClose()
+        if (this.busy) {
+            println("${System.currentTimeMillis()} Busy! Not closing RPC connection!")
+        } else {
+            println("${System.currentTimeMillis()} closing RPC connection")
+            conn.notifyServerAndClose()
+        }
     }
 }
