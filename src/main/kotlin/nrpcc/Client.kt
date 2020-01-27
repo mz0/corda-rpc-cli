@@ -2,13 +2,10 @@ package nrpcc
 
 import net.corda.client.rpc.CordaRPCClient
 import net.corda.core.identity.Party
-import net.corda.core.messaging.CordaRPCOps
+import net.corda.core.messaging.FlowProgressHandle
 import net.corda.core.utilities.NetworkHostAndPort.Companion.parse
 import net.corda.tools.shell.Helper.triggerAndTrackFlowByNameFragment
 import rx.observers.Observers
-import java.util.concurrent.CompletableFuture
-import java.util.concurrent.Executors
-import java.util.concurrent.TimeUnit
 
 enum class Command {
     exec,
@@ -54,16 +51,36 @@ class RpcCmdr(val addr: String, val user: String, private val password: String) 
     }
 
     private fun getSelfID(): Party {
-        return ops.nodeInfo().legalIdentities.first()
+        try {
+            return ops.nodeInfo().legalIdentities.first()
+        } catch (e: net.corda.client.rpc.RPCException) {
+            if (e.message.toString().startsWith("Cannot connect to server(s). Tried with all available servers.")) {
+                throw IllegalArgumentException("Cannot connect to $addr")
+            } else {
+                throw e
+            }
+        } catch (e: Exception) {
+            if (e.message.toString().startsWith("AMQ119031: Unable to validate user from ")) {
+                throw IllegalArgumentException("Cannot login to $addr as '$user' with password '$password'")
+            } else {
+                throw e
+            }
+        }
     }
 
-    private fun exec(flowNam: String, flowArgs: String) {
+    private fun exec(flowNam: String, flowArgs: String) { // TODO how to signal error?
         println("${System.currentTimeMillis()} exec start")
-        val fh = triggerAndTrackFlowByNameFragment(flowNam, flowArgs, ops)
+        val fh: FlowProgressHandle<Any?>
+        try {
+            fh = triggerAndTrackFlowByNameFragment(flowNam, flowArgs, ops)
+        } catch (e: net.corda.tools.shell.Helper.RpcFlowNotFound) {
+            println("Error: $e")
+            return
+        }
         fh.progress.subscribe(Observers.create(
-            { evt: String -> println("${System.currentTimeMillis()} $evt") },   // onNext
-            { t -> println(t.message)},                                         // onError
-            { println("${System.currentTimeMillis()} onComplete fired"); this.busy = false } // onComplete
+                { evt: String -> println("${System.currentTimeMillis()} $evt") },   // onNext
+                { t -> println("Error in exec $flowNam: ${t.message}") },            // onError
+                { println("${System.currentTimeMillis()} onComplete fired"); this.busy = false } // onComplete
         )) // make an Observer, and subscribe it to the FlowProgressHandle updates
 
         this.busy = true; println("${System.currentTimeMillis()} ${fh.returnValue.get()}") // start flow & get result
@@ -74,7 +91,7 @@ class RpcCmdr(val addr: String, val user: String, private val password: String) 
         if (this.busy) {
             println("${System.currentTimeMillis()} Busy! Not closing RPC connection!")
         } else {
-            println("${System.currentTimeMillis()} closing RPC connection")
+            println("${System.currentTimeMillis()} Closing RPC connection")
             conn.notifyServerAndClose()
         }
     }

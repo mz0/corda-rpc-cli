@@ -42,6 +42,7 @@ object Helper {
         }
     }
 
+    // TODO can I have .message() too?
     class RpcFlowNotFound(val error: String, val inList: List<String>) : CordaException(this.toString()) {
         override fun toString() = (listOf("$error") + inList).joinToString(System.lineSeparator())
     }
