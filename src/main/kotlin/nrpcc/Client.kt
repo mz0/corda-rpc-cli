@@ -32,11 +32,11 @@ class RpcCmdr(val addr: String, val user: String, private val password: String) 
             Command.exec -> { exec(flowNam ?: throw IllegalArgumentException("need flow name"), flowArgs)}
             Command.execw -> { println( "e-w unimplemented")}
             Command.execm -> { println( "e-m unimplemented")}
-            Command.peers -> { println( "Peers (excluding self): ${getPeerOrgs()}")}
-            Command.whoami -> { println( "${me.name}")}
+            Command.peers -> { println( "(${me.name}) Peers (excluding self): ${getPeerOrgs()}")}
+            Command.whoami -> { println( "(${me.name})")}
             Command.notars -> { println( "notars unimplemented")}
-            Command.time -> { println( "Node time is ${ops.currentNodeTime()}")}
-            Command.flows -> { println( "Registered flows: ${ops.registeredFlows()}");}
+            Command.time -> { println( "Node (${me.name}) time is ${ops.currentNodeTime()}")}
+            Command.flows -> { println( "Registered flows on (${me.name}): ${ops.registeredFlows()}");}
             Command.down -> { println( "Shutting node ${me.name} down."); ops.shutdown() }
         }
         return this
