@@ -1,9 +1,8 @@
 package nrpcc
 
-//import kotlin.concurrent.thread
-//import kotlinx.coroutines.*
-//import kotlinx.coroutines.experimental.newSingleThreadContext
-import java.util.concurrent.Executors
+import kotlinx.coroutines.experimental.runBlocking
+import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.experimental.Dispatchers
 
 fun main(args: Array<String>) {
     val cmd: Command
@@ -24,18 +23,22 @@ fun main(args: Array<String>) {
     val nodes = listOf(n1, n2, n3, n4, n5)
     val user = "userN"
     val password = "X"
-    val numCores = 5
+    val cmdrs = mutableListOf<RpcCmdr>()
 
-    val runners = Executors.newFixedThreadPool(numCores)
-    nodes.forEach {
-        runners.execute() {
-            println("${System.currentTimeMillis()} $it ${Thread.currentThread().name}")
-            RpcCmdr(it, user, password).cmd(cmd, flowNam, flowArgs).dispose()
-            //Thread.sleep(12) // TODO hide this waiting in dispose(), better yet make it a parameter
+    runBlocking {
+        nodes.forEach {
+            launch(Dispatchers.Default) {
+                cmdrs.add(RpcCmdr(it, user, password).cmd(cmd, flowNam, flowArgs))
+            }
         }
     }
-    println("${System.currentTimeMillis()} setup complete")
-    runners.shutdown()
+
+    Thread.sleep(12) // TODO hide this waiting in dispose(), better yet make it a parameter
+    runBlocking {
+        cmdrs.forEach {
+            launch(Dispatchers.Default) { it.dispose() }
+        }
+    }
 }
 
 fun usage() { println("Usage: <binary> <cmd>\n" +

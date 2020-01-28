@@ -69,7 +69,7 @@ class RpcCmdr(val addr: String, val user: String, private val password: String) 
     }
 
     private fun exec(flowNam: String, flowArgs: String) { // TODO how to signal error?
-        println("${System.currentTimeMillis()} exec start")
+        println("${System.currentTimeMillis()} exec start ${Thread.currentThread().name}")
         val fh: FlowProgressHandle<Any?>
         try {
             fh = triggerAndTrackFlowByNameFragment(flowNam, flowArgs, ops)
