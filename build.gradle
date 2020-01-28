@@ -24,6 +24,7 @@ dependencies {
     implementation "org.apache.logging.log4j:log4j-slf4j-impl:$log4j_version"
     implementation "org.apache.logging.log4j:log4j-core:$log4j_version"
     implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:0.26.0'
  // implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core-common:0.26.0'
     testImplementation 'org.jetbrains.kotlin:kotlin-test'
     testImplementation 'org.jetbrains.kotlin:kotlin-test-junit'
@@ -36,13 +37,15 @@ dependencies {
     compileOnly "io.reactivex:rxjava:1.3.8"
 }
 
-tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile) {
+compileKotlin {
     kotlinOptions {
         languageVersion = "1.2"
         apiVersion = "1.2"
         jvmTarget = "1.8"
     }
 }
+
+kotlin { experimental.coroutines "enable" }
 
 application {
     mainClassName = 'nrpcc.AppKt'
