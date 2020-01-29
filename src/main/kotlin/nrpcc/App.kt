@@ -14,11 +14,12 @@ fun main(args: Array<String>) {
         else -> {cmd = Command.valueOf(args[0]); flowNam=args[1]; flowArgs=args.drop(2).joinToString(separator=" ")}
     }
 
-    val n1 = "localhost:10002"
-    val n2 = "localhost:10012"
-    val n3 = "localhost:10022"
-    val n4 = "localhost:10032"
-    val n5 = "localhost:10042"
+    val host = "p.x302.net"
+    val n1 = "$host:10002"
+    val n2 = "$host:10012"
+    val n3 = "$host:10022"
+    val n4 = "$host:10032"
+    val n5 = "$host:10042"
 
     val nodes = listOf(n1, n2, n3, n4, n5)
     val user = "userN"
