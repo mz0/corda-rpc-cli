@@ -35,7 +35,7 @@ class RpcCmdr(val addr: String, val user: String, private val password: String) 
             Command.peers -> { println( "(${me.name}) Peers (excluding self): ${getPeerOrgs()}")}
             Command.whoami -> { println( "(${me.name})")}
             Command.notars -> { println( "notars unimplemented")}
-            Command.time -> { println( "Node (${me.name}) time is ${ops.currentNodeTime()}")}
+            Command.time -> { println( "${System.currentTimeMillis()} Node (${me.name}) time is ${ops.currentNodeTime()}")}
             Command.flows -> { println( "Registered flows on (${me.name}): ${ops.registeredFlows()}");}
             Command.down -> { println( "Shutting node ${me.name} down."); ops.shutdown() }
         }
