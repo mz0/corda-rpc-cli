@@ -1,0 +1,6 @@
+runno=1
+while :; do
+  echo "____Run $runno__________________________________"
+  ./gradlew run --args="exec CheckN testSize: 102400"
+  runno=$(expr $runno + 1)
+done
